@@ -5,11 +5,27 @@ const authRoutes = require('./routes/auth');
 const therapistRoutes = require('./routes/therapists');
 const appointmentRoutes = require('./routes/appointments');
 
-dotenv.config();
+const allowedOrigins = [
+  'http://localhost:5123',
+  'https://feel-better-web.vercel.app'
+];
 
 const app = express();
 
+app.use(cors({
+  origin: function (origin, callback) {
+    if (!origin) return callback(null, true);
+    if (allowedOrigins.includes(origin)) {
+      return callback(null, true);
+    } else {
+      return callback(new Error('Not allowed by CORS'));
+    }
+  },
+}));
+
+dotenv.config();
 app.use(express.json());
+
 
 app.use('/api/auth', authRoutes);
 app.use('/api/therapists', therapistRoutes);
