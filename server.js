@@ -4,6 +4,7 @@ const dotenv = require('dotenv');
 const authRoutes = require('./routes/auth');
 const therapistRoutes = require('./routes/therapists');
 const appointmentRoutes = require('./routes/appointments');
+const cors = require('cors');
 
 const allowedOrigins = [
   'http://localhost:5123',

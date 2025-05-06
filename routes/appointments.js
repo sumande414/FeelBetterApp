@@ -3,9 +3,6 @@ const router = express.Router();
 const Appointment = require('../models/Appointment');
 const Therapist = require('../models/Therapist');
 const auth = require('../middleware/auth');
-const cors = require('cors');
-
-router.use(cors());
 
 
 router.get('/fetch-appointments', auth('user'), async (req, res) => {

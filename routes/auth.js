@@ -1,10 +1,7 @@
 const express = require('express');
 const jwt = require('jsonwebtoken');
 const User = require('../models/User');
-const cors = require('cors');
 const router = express.Router();
-
-router.use(cors());
 
 router.post('/signup', async (req, res) => {
   const { email, password, name } = req.body;

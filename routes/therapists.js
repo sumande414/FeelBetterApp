@@ -2,10 +2,7 @@ const express = require('express');
 const Therapist = require('../models/Therapist');
 const Appointment = require('../models/Appointment');
 const auth = require('../middleware/auth');
-const cors = require('cors');
 const router = express.Router();
-
-router.use(cors());
 
 router.get('/fetch-all', async (req, res) => {
   try {
