@@ -7,7 +7,7 @@ const appointmentRoutes = require('./routes/appointments');
 const cors = require('cors');
 
 const allowedOrigins = [
-  'http://localhost:5123',
+  'http://localhost:5173',
   'https://feel-better-web.vercel.app'
 ];
 
