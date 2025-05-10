@@ -31,58 +31,46 @@ router.post('/add', auth('admin'), async (req, res) => {
 router.post('/slots', auth('user'), async (req, res) => {
   try {
     const { id, date } = req.body;
-    
+
     if (!date) {
       return res.status(400).json({ message: 'Date is required' });
     }
-    
+
     const therapist = await Therapist.findById(id);
     if (!therapist) {
       return res.status(404).json({ message: 'Therapist not found' });
     }
-    
+
     const selectedDate = new Date(date);
     if (isNaN(selectedDate)) {
       return res.status(400).json({ message: 'Invalid date' });
     }
-    
-    // Create date objects for start and end of day
+
+    const slots = [];
+    for (let hour = 9; hour <= 17; hour++) {
+      slots.push({ time: `${hour}:00`, slotDate: new Date(selectedDate.setHours(hour, 0, 0, 0)).toISOString() });
+    }
+
     const startOfDay = new Date(selectedDate);
     startOfDay.setHours(0, 0, 0, 0);
     const endOfDay = new Date(selectedDate);
     endOfDay.setHours(23, 59, 59, 999);
-    
-    // First, fetch all booked appointments for the day
+
     const bookedAppointments = await Appointment.find({
       therapistId: id,
       slotDate: { $gte: startOfDay, $lte: endOfDay },
-    }).lean();
-    
-    // Create a map of booked hours for faster lookup
-    const bookedHours = {};
-    bookedAppointments.forEach(appt => {
-      const apptDate = new Date(appt.slotDate);
-      const hour = apptDate.getHours();
-      bookedHours[hour] = true;
     });
-    
-    // Generate slots with booking status
-    const slots = [];
-    for (let hour = 9; hour <= 17; hour++) {
-      const slotDate = new Date(selectedDate);
-      slotDate.setHours(hour, 0, 0, 0);
-      
-      slots.push({
-        time: `${hour}:00`,
-        slotDate: slotDate.toISOString(),
-        isBooked: bookedHours[hour] || false
-      });
-    }
-    
-    res.json({ slots });
+
+    const availableSlots = slots.map((slot) => {
+      const isBooked = bookedAppointments.some(
+        (appt) => new Date(appt.slotDate).getHours() === parseInt(slot.time)
+      );
+      return { time: slot.time, isBooked };
+    });
+
+    res.json({ slots: availableSlots });
   } catch (error) {
-    console.error('Slots route error:', error);
-    res.status(500).json({ message: `Server error: ${error.message}` });
+    res.status(500).json({ message: `Server error : ${error}` });
   }
 });
 module.exports = router;
